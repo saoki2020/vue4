@@ -1,18 +1,15 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <Login/>
+    <router-view/>
   </div>
 </template>
 
 <script>
-import Login from './components/Login.vue'
-
 export default {
-  name: 'App',
-  components: {
-    Login
-  }
+  mounted() {
+      this.$router.push('SignUp');
+    },
 }
 </script>
 
@@ -23,6 +20,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
+
 </style>
