@@ -25,31 +25,33 @@
 </template>
 
 <script>
-// import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-// export default {
-//   name: "SignUp",
-//   data() {
-//     return {
-//       username: "",
-//       mailaddress: "",
-//       password: "",
-//     }
-//   },
-//   methods: {
-//     signUp() {
-//       createUserWithEmailAndPassword(this.username, this.mailaddress, this.password)
-//       .then(
-//         alert("OKです")
-//       )
-//       .catch(error => {
-//         const errorCode = error.code;
-//         const errorMessage = error.Message;
-//         alert(errorCode, errorMessage);
-//         })
-//     },
-//   }
-// }
+export default {
+  name: "SignUp",
+  data() {
+    return {
+      username: "",
+      mailaddress: "",
+      password: "",
+    }
+  },
+  methods: {
+    signUp() {
+      const auth = getAuth();
+      createUserWithEmailAndPassword(auth, this.mailaddress, this.password)
+      .then(
+        console.log(),
+        alert("OKです")
+      )
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.Message;
+        alert(errorCode, errorMessage);
+        })
+    },
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
