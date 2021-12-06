@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-
 export default {
   name: "SignUp",
   data() {
@@ -38,16 +36,10 @@ export default {
   },
   methods: {
     signUp() {
-      const auth = getAuth();
-      createUserWithEmailAndPassword(auth, this.mailaddress, this.password)
-      .then(
-        console.log(),
-        alert("OKです")
-      )
-      .catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.Message;
-        alert(errorCode, errorMessage);
+      this.$store.dispatch('createUser',{
+        userName: this.username,
+        userMail: this.mailaddress,
+        userPass: this.password
         })
     },
   }
