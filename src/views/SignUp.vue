@@ -37,10 +37,10 @@ export default {
   methods: {
     signUp() {
       this.$store.dispatch('createUser',{
-        userName: this.username,
-        userMail: this.mailaddress,
-        userPass: this.password
-        })
+      userName: this.username,
+      userMail: this.mailaddress,
+      userPass: this.password
+      })
     },
   }
 }
