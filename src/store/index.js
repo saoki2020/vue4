@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import router from '../router';
 
 Vue.use(Vuex)
 
@@ -8,7 +9,8 @@ export default new Vuex.Store({
   state: {
     username: '',
     mailaddress: '',
-    password: ''
+    password: '',
+    wallet: '0',
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
@@ -20,6 +22,9 @@ export default new Vuex.Store({
   getters: {
     getUserName(state) {
       return state.username
+    },
+    getUserWallet(state) {
+      return state.wallet
     },
   },
   actions: {
@@ -41,6 +46,7 @@ export default new Vuex.Store({
         commit('setUserData', {userName, userMail, userPass})
       }).then(() => {
         console.log(`${getters.getUserName} is Login!!`)
+        router.push('Dashboard')
       }).catch(error => {
         console.log(error.code, error.Message)
       })

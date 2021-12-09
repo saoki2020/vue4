@@ -7,9 +7,6 @@
 
 <script>
 export default {
-  mounted() {
-      this.$router.push('SignUp');
-    },
 }
 </script>
 
