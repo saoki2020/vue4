@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
 
 Vue.use(Vuex)
 
@@ -29,11 +29,22 @@ export default new Vuex.Store({
       .then(() => {
         commit('setUserData', {userName, userMail, userPass})
       }).then(() => {
-        alert(`${getters.getUserName} is sign up!!`)
+        console.log(`${getters.getUserName} is sign up!!`)
       }).catch(error => {
-        alert(error.code, error.Message)
+        console.log(error.code, error.Message)
       })
-    }
+    },
+    async loginByMail({commit, getters}, {userName, userMail, userPass}) {
+      const auth = getAuth();
+      await signInWithEmailAndPassword(auth, userMail, userPass)
+      .then(() => {
+        commit('setUserData', {userName, userMail, userPass})
+      }).then(() => {
+        console.log(`${getters.getUserName} is Login!!`)
+      }).catch(error => {
+        console.log(error.code, error.Message)
+      })
+    },
   },
   modules: {
   }
