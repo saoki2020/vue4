@@ -10,7 +10,7 @@ export default new Vuex.Store({
     username: '',
     mailaddress: '',
     password: '',
-    wallet: '0',
+    wallet: 0,
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
