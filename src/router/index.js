@@ -26,7 +26,7 @@ const routes = [
         if(user) {
           next()
         } else {
-          next('/')
+          next('/Login')
         }
       })
     }
