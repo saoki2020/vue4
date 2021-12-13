@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 import router from '../router';
 
 Vue.use(Vuex)
@@ -33,6 +34,19 @@ export default new Vuex.Store({
       await createUserWithEmailAndPassword(auth, userMail, userPass)
       .then(() => {
         commit('setUserData', {userName, userMail, userPass})
+      }).then(async() => {
+        const db = getFirestore();
+        try {
+          const userRef = await addDoc(collection(db, "users"), {
+            UserName: userName,
+            MailAddress: userMail,
+            PassWord: userPass,
+            Wallet: 0,
+          });
+          console.log("Document written with ID: ", userRef.id);
+        } catch (e) {
+          console.log(e)
+        }
       }).then(() => {
         console.log(`${getters.getUserName} is sign up!!`)
       }).catch(error => {
