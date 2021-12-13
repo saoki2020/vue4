@@ -8,7 +8,7 @@
         <p>残高：{{ UserWallet }}</p>
       </div>
       <div class="header_item">
-        <button>ログアウト</button>
+        <button @click="Logout()">ログアウト</button>
       </div>
     </div>
     <h1>ユーザ一覧</h1>
@@ -26,6 +26,11 @@ export default {
       return this.$store.getters.getUserWallet
     }
   },
+  methods: {
+    Logout() {
+      this.$store.dispatch('logout')
+    }
+  }
 }
 </script>
 
