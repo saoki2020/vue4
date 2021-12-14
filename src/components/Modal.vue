@@ -1,8 +1,8 @@
 <template>
   <div class="modal" @click="CloseModal()">
     <div class="modal_box">
-      <span class="modal_message">{{UserName}}さんの残高</span>
-      <span class="modal_message">{{UserWallet}}</span>
+      <span class="modal_message">{{PickedUserName}}さんの残高</span>
+      <span class="modal_message">{{PickedUserWallet}}</span>
       <div class="modal_action">
         <button class="modal_btn" @click="CloseModal()">close</button>
       </div>
@@ -14,11 +14,11 @@
 export default {
   name: "Modal",
   computed: {
-    UserName() {
-      return this.$store.getters.gettersUserName
+    PickedUserName() {
+      return this.$store.getters.gettersPickedUserName
     },
-    UserWallet() {
-      return this.$store.getters.gettersUserWallet
+    PickedUserWallet() {
+      return this.$store.getters.gettersPickedUserWallet
     },
   },
   methods: {
@@ -44,7 +44,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  z-index: 1;
 }
 
 .modal_box {

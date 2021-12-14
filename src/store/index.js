@@ -15,6 +15,8 @@ export default new Vuex.Store({
     wallet: 0,
     users: [],
     modal: false,
+    pickedUserName: '',
+    pickedUserWallet: '',
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
@@ -27,7 +29,13 @@ export default new Vuex.Store({
     },
     setModal(state, payload) {
       state.modal = payload;
-    }
+    },
+    setPickedUserName(state, name) {
+      state.pickedUserName = name;
+    },
+    setPickedUserWallet(state, wallet) {
+      state.pickedUserWallet = wallet;
+    },
   },
   getters: {
     gettersUserName(state) {
@@ -41,7 +49,13 @@ export default new Vuex.Store({
     },
     gettersIsOpen(state) {
       return state.modal
-    }
+    },
+    gettersPickedUserName(state) {
+      return state.pickedUserName
+    },
+    gettersPickedUserWallet(state) {
+      return state.pickedUserWallet
+    },
   },
   actions: {
     //新規登録
@@ -109,6 +123,12 @@ export default new Vuex.Store({
     //モーダルウィンドの操作
     actionModal({commit}, payload) {
       commit('setModal', payload)
+    },
+    actionPickedUserName({commit}, name) {
+      commit('setPickedUserName', name)
+    },
+    actionPickedUserWallet({commit}, wallet) {
+      commit('setPickedUserWallet', wallet)
     },
   },
   modules: {

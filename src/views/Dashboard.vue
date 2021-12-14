@@ -21,7 +21,7 @@
       <tbody>
         <tr v-for="(user, index) in UsersFromDb" v-bind:key="index">
           <td>{{user.UserName}}</td>
-          <td><button @click="ShowWallet()">Walletを見る</button></td>
+          <td><button @click="ShowWallet(user.UserName, UserWallet)">Walletを見る</button></td>
           <td><button @click="SendMoney()">送る</button></td>
         </tr>
       </tbody>
@@ -56,8 +56,10 @@ export default {
     Logout() {
       this.$store.dispatch('logout')
     },
-    ShowWallet() {
+    ShowWallet(name, wallet) {
       this.$store.dispatch('actionModal', true)
+      this.$store.dispatch('actionPickedUserName', name)
+      this.$store.dispatch('actionPickedUserWallet', wallet)
     },
   },
   mounted() {
