@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import router from '../router';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { getFirestore, collection, addDoc, query, getDocs, where } from "firebase/firestore"
+import router from '../router'
+
 
 Vue.use(Vuex)
 
@@ -12,28 +13,44 @@ export default new Vuex.Store({
     mailaddress: '',
     password: '',
     wallet: 0,
+    users: [],
+    modal: false,
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
       state.username = userName;
       state.mailaddress = userMail;
       state.password = userPass;
+    },
+    setUserInfo(state, {UsersFromDb}) {
+      state.users = UsersFromDb;
+    },
+    setModal(state, payload) {
+      state.modal = payload;
     }
   },
   getters: {
-    getUserName(state) {
+    gettersUserName(state) {
       return state.username
     },
-    getUserWallet(state) {
+    gettersUserWallet(state) {
       return state.wallet
     },
+    gettersUsersFromDb(state) {
+      return state.users
+    },
+    gettersIsOpen(state) {
+      return state.modal
+    }
   },
   actions: {
+    //新規登録
     async createUser({commit, getters}, {userName, userMail, userPass}) {
       const auth = getAuth();
       await createUserWithEmailAndPassword(auth, userMail, userPass)
       .then(() => {
         commit('setUserData', {userName, userMail, userPass})
+    //firestoreにユーザ情報を保存
       }).then(async() => {
         const db = getFirestore();
         try {
@@ -48,32 +65,50 @@ export default new Vuex.Store({
           console.log(e)
         }
       }).then(() => {
-        console.log(`${getters.getUserName} is sign up!!`)
+        console.log(`${getters.gettersUserName} is sign up!!`)
       }).catch(error => {
         console.log(error.code, error.Message)
       })
     },
+    //ログイン&ダッシュボード画面へ遷移
     async loginByMail({commit, getters}, {userName, userMail, userPass}) {
       const auth = getAuth();
       await signInWithEmailAndPassword(auth, userMail, userPass)
       .then(() => {
         commit('setUserData', {userName, userMail, userPass})
       }).then(() => {
-        console.log(`${getters.getUserName} is Login!!`)
+        console.log(`${getters.gettersUserName} is Login!!`)
         router.push('Dashboard')
       }).catch(error => {
         console.log(error.code, error.Message)
       })
     },
+    //ログアウト&ログイン画面へ遷移
     async logout() {
       const auth = getAuth();
       await signOut(auth)
       .then(() => {
         console.log("Logout!!")
-        router.push('Login')
+    //NavigationDuplicated:が出るので修正
+        router.push('Login', () => {})
       }).catch((error) => {
         console.log(error)
       })
+    },
+    //BDから自分以外のユーザ情報を取得
+    async getUserInfo({commit, getters} ) {
+      const db = getFirestore();
+      const q = query(collection(db, "users"), where("UserName", "!=", getters.gettersUserName));
+      const querySnapshot = await getDocs(q);
+      const UsersFromDb = [];
+      querySnapshot.forEach((user) => {
+        UsersFromDb.push(user.data());
+      });
+      commit('setUserInfo', {UsersFromDb})
+    },
+    //モーダルウィンドの操作
+    actionModal({commit}, payload) {
+      commit('setModal', payload)
     },
   },
   modules: {

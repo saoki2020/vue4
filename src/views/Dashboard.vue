@@ -12,24 +12,56 @@
       </div>
     </div>
     <h1>ユーザ一覧</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ユーザ名</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in UsersFromDb" v-bind:key="index">
+          <td>{{user.UserName}}</td>
+          <td><button @click="ShowWallet()">Walletを見る</button></td>
+          <td><button @click="SendMoney()">送る</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <Modal v-if="isOpen"/>
   </div>
 </template>
 
 <script>
+import Modal from '../components/Modal.vue'
+
 export default {
   name: "Dashboard",
+  components: {
+    Modal
+  },
   computed: {
     UserName() {
-      return this.$store.getters.getUserName
+      return this.$store.getters.gettersUserName
     },
     UserWallet() {
-      return this.$store.getters.getUserWallet
-    }
+      return this.$store.getters.gettersUserWallet
+    },
+    UsersFromDb() {
+      return this.$store.getters.gettersUsersFromDb
+    },
+    isOpen() {
+      return this.$store.getters.gettersIsOpen
+    },
   },
   methods: {
     Logout() {
       this.$store.dispatch('logout')
-    }
+    },
+    ShowWallet() {
+      this.$store.dispatch('actionModal', true)
+    },
+  },
+  mounted() {
+    this.$store.dispatch('getUserInfo')
   }
 }
 </script>

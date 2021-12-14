@@ -41,7 +41,6 @@ export default {
       userMail: this.mailaddress,
       userPass: this.password
       });
-      this.$store.dispatch('setDataBase')
     },
   }
 }
