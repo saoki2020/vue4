@@ -2,10 +2,10 @@
   <div>
     <div class="header_container">
       <div class="header_item">
-        <p>{{ UserName }}さんようこそ</p>
+        <p>{{ userName }}さんようこそ</p>
       </div>
       <div class="header_item">
-        <p>残高：{{ UserWallet }}</p>
+        <p>残高：{{ userWallet }}</p>
       </div>
       <div class="header_item">
         <button @click="Logout()">ログアウト</button>
@@ -19,9 +19,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(user, index) in UsersFromDb" v-bind:key="index">
+        <tr v-for="(user, index) in users" v-bind:key="index">
           <td>{{user.UserName}}</td>
-          <td><button @click="ShowWallet(user.UserName, UserWallet)">Walletを見る</button></td>
+          <td><button @click="ShowWallet(user.UserName, user.Wallet)">Walletを見る</button></td>
           <td><button @click="SendMoney()">送る</button></td>
         </tr>
       </tbody>
@@ -39,14 +39,14 @@ export default {
     Modal
   },
   computed: {
-    UserName() {
+    userName() {
       return this.$store.getters.gettersUserName
     },
-    UserWallet() {
+    userWallet() {
       return this.$store.getters.gettersUserWallet
     },
-    UsersFromDb() {
-      return this.$store.getters.gettersUsersFromDb
+    users() {
+      return this.$store.getters.gettersUsers
     },
     isOpen() {
       return this.$store.getters.gettersIsOpen
@@ -63,7 +63,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('getUserInfo')
+    this.$store.dispatch('getUsers')
   }
 }
 </script>

@@ -16,7 +16,7 @@ export default new Vuex.Store({
     users: [],
     modal: false,
     pickedUserName: '',
-    pickedUserWallet: '',
+    pickedUserWallet:'',
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
@@ -24,8 +24,8 @@ export default new Vuex.Store({
       state.mailaddress = userMail;
       state.password = userPass;
     },
-    setUserInfo(state, {UsersFromDb}) {
-      state.users = UsersFromDb;
+    setUsers(state, {users}) {
+      state.users = users;
     },
     setModal(state, payload) {
       state.modal = payload;
@@ -44,7 +44,7 @@ export default new Vuex.Store({
     gettersUserWallet(state) {
       return state.wallet
     },
-    gettersUsersFromDb(state) {
+    gettersUsers(state) {
       return state.users
     },
     gettersIsOpen(state) {
@@ -110,15 +110,15 @@ export default new Vuex.Store({
       })
     },
     //BDから自分以外のユーザ情報を取得
-    async getUserInfo({commit, getters} ) {
+    async getUsers({commit, getters} ) {
       const db = getFirestore();
       const q = query(collection(db, "users"), where("UserName", "!=", getters.gettersUserName));
       const querySnapshot = await getDocs(q);
-      const UsersFromDb = [];
+      const users = [];
       querySnapshot.forEach((user) => {
-        UsersFromDb.push(user.data());
+        users.push(user.data());
       });
-      commit('setUserInfo', {UsersFromDb})
+      commit('setUsers', {users})
     },
     //モーダルウィンドの操作
     actionModal({commit}, payload) {

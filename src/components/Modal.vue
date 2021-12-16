@@ -1,10 +1,10 @@
 <template>
-  <div class="modal" @click="CloseModal()">
+  <div class="modal" @click="closeModal()">
     <div class="modal_box">
-      <span class="modal_message">{{PickedUserName}}さんの残高</span>
-      <span class="modal_message">{{PickedUserWallet}}</span>
+      <span class="modal_message">{{pickedUserName}}さんの残高</span>
+      <span class="modal_message">{{pickedUserWallet}}</span>
       <div class="modal_action">
-        <button class="modal_btn" @click="CloseModal()">close</button>
+        <button class="modal_btn" @click="closeModal()">close</button>
       </div>
     </div>
   </div>
@@ -14,15 +14,15 @@
 export default {
   name: "Modal",
   computed: {
-    PickedUserName() {
+    pickedUserName() {
       return this.$store.getters.gettersPickedUserName
     },
-    PickedUserWallet() {
+    pickedUserWallet() {
       return this.$store.getters.gettersPickedUserWallet
     },
   },
   methods: {
-    CloseModal() {
+    closeModal() {
       this.$store.dispatch('actionModal', false)
     }
   }
