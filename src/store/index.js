@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
-import { getFirestore, collection, addDoc, query, getDocs, where } from "firebase/firestore"
+import { getFirestore, collection, addDoc, query, getDocs, where, onSnapshot} from "firebase/firestore"
 import router from '../router'
 
 
@@ -14,9 +14,10 @@ export default new Vuex.Store({
     password: '',
     wallet: 0,
     users: [],
-    modal: false,
+    walletWindow: false,
+    sendWindow: false,
     pickedUserName: '',
-    pickedUserWallet:'',
+    pickedUserWallet: '',
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
@@ -27,14 +28,20 @@ export default new Vuex.Store({
     setUsers(state, {users}) {
       state.users = users;
     },
-    setModal(state, payload) {
-      state.modal = payload;
+    setShowWalletWindow(state, payload) {
+      state.walletWindow = payload;
+    },
+    setSendMoneyWindow(state, payload) {
+      state.sendWindow = payload;
     },
     setPickedUserName(state, name) {
       state.pickedUserName = name;
     },
     setPickedUserWallet(state, wallet) {
       state.pickedUserWallet = wallet;
+    },
+    setMyWallet(state, wallet) {
+      state.wallet = wallet;
     },
   },
   getters: {
@@ -47,8 +54,11 @@ export default new Vuex.Store({
     gettersUsers(state) {
       return state.users
     },
-    gettersIsOpen(state) {
-      return state.modal
+    gettersShowWalletOpen(state) {
+      return state.walletWindow
+    },
+    gettersSendMoneyOpen(state) {
+      return state.sendWindow
     },
     gettersPickedUserName(state) {
       return state.pickedUserName
@@ -56,6 +66,9 @@ export default new Vuex.Store({
     gettersPickedUserWallet(state) {
       return state.pickedUserWallet
     },
+    gettersMyWallet(state) {
+      return state.wallet
+    }
   },
   actions: {
     //新規登録
@@ -110,7 +123,7 @@ export default new Vuex.Store({
       })
     },
     //BDから自分以外のユーザ情報を取得
-    async getUsers({commit, getters} ) {
+    async getUsers({commit, getters}) {
       const db = getFirestore();
       const q = query(collection(db, "users"), where("UserName", "!=", getters.gettersUserName));
       const querySnapshot = await getDocs(q);
@@ -121,14 +134,29 @@ export default new Vuex.Store({
       commit('setUsers', {users})
     },
     //モーダルウィンドの操作
-    actionModal({commit}, payload) {
-      commit('setModal', payload)
+    actionShowWalletWindow({commit}, payload) {
+      commit('setShowWalletWindow', payload)
+    },
+    actionSendMoneyWindow({commit}, payload) {
+      commit('setSendMoneyWindow', payload)
     },
     actionPickedUserName({commit}, name) {
       commit('setPickedUserName', name)
     },
     actionPickedUserWallet({commit}, wallet) {
       commit('setPickedUserWallet', wallet)
+    },
+    //自分のwalletをリアルタイムに取得する
+    getMyWallet({commit, getters}) {
+      const db = getFirestore();
+      const q = query(collection(db, "users"), where("UserName", "==", getters.gettersUserName));
+      onSnapshot(q, (querySnapshot) => {
+        const users = [];
+        querySnapshot.forEach((user) => {
+          users.push(user.data());
+        });
+        commit('setMyWallet', users[0].Wallet)
+      })
     },
   },
   modules: {

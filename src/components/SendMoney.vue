@@ -1,10 +1,11 @@
 <template>
-  <div class="modal" @click="closeModal()">
+  <div class="modal">
     <div class="modal_box">
-      <span class="modal_message">{{pickedUserName}}さんの残高</span>
-      <span class="modal_message">{{pickedUserWallet}}</span>
+      <span class="modal_message">あなたの残高：{{myWallet}}</span>
+      <span class="modal_message">送る金額</span>
+      <input type="text" v-model="money">
       <div class="modal_action">
-        <button class="modal_btn" @click="closeModal()">close</button>
+        <button class="modal_btn" @click="sendMoney()">送信</button>
       </div>
     </div>
   </div>
@@ -12,18 +13,20 @@
 
 <script>
 export default {
-  name: "Modal",
+  name: "SendMoney",
+  data() {
+    return {
+      money: "",
+    }
+  },
   computed: {
-    pickedUserName() {
-      return this.$store.getters.gettersPickedUserName
-    },
-    pickedUserWallet() {
-      return this.$store.getters.gettersPickedUserWallet
-    },
+    myWallet() {
+      return this.$store.getters.gettersMyWallet
+    }
   },
   methods: {
-    closeModal() {
-      this.$store.dispatch('actionModal', false)
+    sendMoney() {
+      this.$store.dispatch('actionSendMoneyWindow', false)
     }
   }
 }
