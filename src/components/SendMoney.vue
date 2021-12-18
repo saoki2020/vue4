@@ -5,7 +5,7 @@
       <span class="modal_message">送る金額</span>
       <input type="text" v-model="money">
       <div class="modal_action">
-        <button class="modal_btn" @click="sendMoney()">送信</button>
+        <button class="modal_btn" @click="sendMoney(money)">送信</button>
       </div>
     </div>
   </div>
@@ -25,8 +25,9 @@ export default {
     }
   },
   methods: {
-    sendMoney() {
+    sendMoney(money) {
       this.$store.dispatch('actionSendMoneyWindow', false)
+      this.$store.dispatch('updateWallet', money)
     }
   }
 }

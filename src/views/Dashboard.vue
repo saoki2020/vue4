@@ -20,9 +20,9 @@
       </thead>
       <tbody>
         <tr v-for="(user, index) in users" v-bind:key="index">
-          <td>{{user.UserName}}</td>
-          <td><button @click="showWalletWindow(user.UserName, user.Wallet)">Walletを見る</button></td>
-          <td><button @click="sendMoneyWindow()">送る</button></td>
+          <td>{{user.userName}}</td>
+          <td><button @click="showWalletWindow(user.userName, user.wallet)">Walletを見る</button></td>
+          <td><button @click="sendMoneyWindow(user.userName)">送る</button></td>
         </tr>
       </tbody>
     </table>
@@ -67,8 +67,9 @@ export default {
       this.$store.dispatch('actionPickedUserName', name)
       this.$store.dispatch('actionPickedUserWallet', wallet)
     },
-    sendMoneyWindow() {
+    sendMoneyWindow(name) {
       this.$store.dispatch('actionSendMoneyWindow', true)
+      this.$store.dispatch('actionPickedUserName', name)
     },
   },
   mounted() {

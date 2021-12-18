@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
-import { getFirestore, collection, addDoc, query, getDocs, where, onSnapshot} from "firebase/firestore"
+import { getFirestore, collection, addDoc, query, getDocs, where, onSnapshot, doc, updateDoc, increment} from "firebase/firestore"
 import router from '../router'
 
 
@@ -18,6 +18,7 @@ export default new Vuex.Store({
     sendWindow: false,
     pickedUserName: '',
     pickedUserWallet: '',
+    myDocumentId: '',
   },
   mutations: {
     setUserData(state, {userName, userMail, userPass}) {
@@ -42,6 +43,9 @@ export default new Vuex.Store({
     },
     setMyWallet(state, wallet) {
       state.wallet = wallet;
+    },
+    setMyDocumentId(state, id) {
+      state.myDocumentId = id;
     },
   },
   getters: {
@@ -68,7 +72,10 @@ export default new Vuex.Store({
     },
     gettersMyWallet(state) {
       return state.wallet
-    }
+    },
+    gettersMyDocumentId(state) {
+      return state.myDocumentId
+    },
   },
   actions: {
     //新規登録
@@ -82,10 +89,10 @@ export default new Vuex.Store({
         const db = getFirestore();
         try {
           const userRef = await addDoc(collection(db, "users"), {
-            UserName: userName,
-            MailAddress: userMail,
-            PassWord: userPass,
-            Wallet: 0,
+            userName: userName,
+            mailAddress: userMail,
+            passWord: userPass,
+            wallet: 0,
           });
           console.log("Document written with ID: ", userRef.id);
         } catch (e) {
@@ -122,16 +129,17 @@ export default new Vuex.Store({
         console.log(error)
       })
     },
-    //BDから自分以外のユーザ情報を取得
+    //DBから自分以外のユーザ情報を取得（リアルタイム）
     async getUsers({commit, getters}) {
       const db = getFirestore();
-      const q = query(collection(db, "users"), where("UserName", "!=", getters.gettersUserName));
-      const querySnapshot = await getDocs(q);
-      const users = [];
-      querySnapshot.forEach((user) => {
-        users.push(user.data());
+      const q = query(collection(db, "users"), where("userName", "!=", getters.gettersUserName));
+      onSnapshot(q, (querySnapshot) => {
+        const users = [];
+        querySnapshot.forEach((user) => {
+          users.push(user.data());
+        });
+        commit('setUsers', {users})
       });
-      commit('setUsers', {users})
     },
     //モーダルウィンドの操作
     actionShowWalletWindow({commit}, payload) {
@@ -149,15 +157,38 @@ export default new Vuex.Store({
     //自分のwalletをリアルタイムに取得する
     getMyWallet({commit, getters}) {
       const db = getFirestore();
-      const q = query(collection(db, "users"), where("UserName", "==", getters.gettersUserName));
+      const q = query(collection(db, "users"), where("userName", "==", getters.gettersUserName));
       onSnapshot(q, (querySnapshot) => {
         const users = [];
         querySnapshot.forEach((user) => {
           users.push(user.data());
+          commit('setMyDocumentId', user.id)
         });
-        commit('setMyWallet', users[0].Wallet)
+        commit('setMyWallet', users[0].wallet)
       })
     },
+    //DBのwalletを更新
+    async updateWallet({getters}, money) {
+      //選択したuserのドキュメントidを取得する
+      const db = getFirestore();
+      const q = query(collection(db, "users"), where("userName", "==", getters.gettersPickedUserName));
+      const querySnapshot = await getDocs(q);
+      let documentId = "";
+      querySnapshot.forEach((user) => {
+        documentId = user.id
+      });
+      //walletに加算する
+      const walletRef = doc(db, "users", documentId);
+      await updateDoc(walletRef, {
+        wallet: increment(money)
+      });
+      //自分のwalletを減らす
+      const myDocumentId = getters.gettersMyDocumentId;
+      const myWalletRef = doc(db, "users", myDocumentId);
+      await updateDoc(myWalletRef, {
+        wallet: increment(-money)
+      });
+    }
   },
   modules: {
   }
