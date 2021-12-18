@@ -40,7 +40,7 @@ export default {
       userName: this.username,
       userMail: this.mailaddress,
       userPass: this.password
-      })
+      });
     },
   }
 }

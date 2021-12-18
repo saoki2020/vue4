@@ -2,34 +2,78 @@
   <div>
     <div class="header_container">
       <div class="header_item">
-        <p>{{ UserName }}さんようこそ</p>
+        <p>{{ userName }}さんようこそ</p>
       </div>
       <div class="header_item">
-        <p>残高：{{ UserWallet }}</p>
+        <p>残高：{{ userWallet }}</p>
       </div>
       <div class="header_item">
-        <button @click="Logout()">ログアウト</button>
+        <button @click="logout()">ログアウト</button>
       </div>
     </div>
     <h1>ユーザ一覧</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ユーザ名</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in users" v-bind:key="index">
+          <td>{{user.UserName}}</td>
+          <td><button @click="showWalletWindow(user.UserName, user.Wallet)">Walletを見る</button></td>
+          <td><button @click="sendMoneyWindow()">送る</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <ShowWallet v-if="showWalletOpen"/>
+    <SendMoney v-if="sendMoneyOpen"/>
   </div>
 </template>
 
 <script>
+import ShowWallet from '../components/ShowWallet.vue'
+import SendMoney from '../components/SendMoney.vue'
+
 export default {
   name: "Dashboard",
+  components: {
+    ShowWallet,
+    SendMoney
+  },
   computed: {
-    UserName() {
-      return this.$store.getters.getUserName
+    userName() {
+      return this.$store.getters.gettersUserName
     },
-    UserWallet() {
-      return this.$store.getters.getUserWallet
-    }
+    userWallet() {
+      return this.$store.getters.gettersUserWallet
+    },
+    users() {
+      return this.$store.getters.gettersUsers
+    },
+    showWalletOpen() {
+      return this.$store.getters.gettersShowWalletOpen
+    },
+    sendMoneyOpen() {
+      return this.$store.getters.gettersSendMoneyOpen
+    },
   },
   methods: {
-    Logout() {
+    logout() {
       this.$store.dispatch('logout')
-    }
+    },
+    showWalletWindow(name, wallet) {
+      this.$store.dispatch('actionShowWalletWindow', true)
+      this.$store.dispatch('actionPickedUserName', name)
+      this.$store.dispatch('actionPickedUserWallet', wallet)
+    },
+    sendMoneyWindow() {
+      this.$store.dispatch('actionSendMoneyWindow', true)
+    },
+  },
+  mounted() {
+    this.$store.dispatch('getUsers');
+    this.$store.dispatch('getMyWallet');
   }
 }
 </script>
