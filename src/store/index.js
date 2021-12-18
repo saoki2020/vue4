@@ -162,6 +162,7 @@ export default new Vuex.Store({
         const users = [];
         querySnapshot.forEach((user) => {
           users.push(user.data());
+          //自分のdocumentIDをstoreに追加
           commit('setMyDocumentId', user.id)
         });
         commit('setMyWallet', users[0].wallet)
