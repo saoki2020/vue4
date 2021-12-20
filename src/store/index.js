@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
-import { getFirestore, collection, addDoc, query, getDocs, where, onSnapshot, doc, updateDoc, increment} from "firebase/firestore"
+import { getFirestore, collection, addDoc, query, getDocs, where, onSnapshot, doc, runTransaction} from "firebase/firestore"
 import router from '../router'
 
 
@@ -17,7 +17,7 @@ export default new Vuex.Store({
     walletWindow: false,
     sendWindow: false,
     pickedUserName: '',
-    pickedUserWallet: '',
+    pickedUserWallet: 0,
     myDocumentId: '',
   },
   mutations: {
@@ -168,7 +168,7 @@ export default new Vuex.Store({
         commit('setMyWallet', users[0].wallet)
       })
     },
-    //DBのwalletを更新
+    //DBのwalletを更新（トランザクション）
     async updateWallet({getters}, money) {
       //選択したuserのドキュメントidを取得する
       const db = getFirestore();
@@ -178,17 +178,49 @@ export default new Vuex.Store({
       querySnapshot.forEach((user) => {
         documentId = user.id
       });
-      //walletに加算する
-      const walletRef = doc(db, "users", documentId);
-      await updateDoc(walletRef, {
-        wallet: increment(money)
-      });
-      //自分のwalletを減らす
+      //自分のwalletを減らす（減らした後が0以上の場合は実行）
       const myDocumentId = getters.gettersMyDocumentId;
-      const myWalletRef = doc(db, "users", myDocumentId);
-      await updateDoc(myWalletRef, {
-        wallet: increment(-money)
-      });
+      const myDocRef = doc(db, "users", myDocumentId);
+      try {
+        const newMyWallet = await runTransaction(db, async (transaction) => {
+          const myDoc = await transaction.get(myDocRef);
+          if (!myDoc.exists()) {
+            throw "MyDocument does not exist!";
+          }
+          console.log(typeof(money));
+          const newWallet = myDoc.data().wallet - Number(money);
+          console.log(typeof(newWallet));
+          if (newWallet >= 0) {
+            transaction.update(myDocRef, { wallet: newWallet });
+            return newWallet;
+          } else {
+            return Promise.reject(" Sorry! Not Enough Money Left ");
+          }
+        });
+        console.log(" MyWallet decreased to ", newMyWallet);
+
+        //選択したユーザのwalletに加算する
+        const pickedUserDocRef = doc(db, "users", documentId);
+        const newPickedUserWallet = await runTransaction(db, async (transaction) => {
+          const pickedUserDoc = await transaction.get(pickedUserDocRef);
+          if (!pickedUserDoc.exists()) {
+            throw "PickedUserDocument does not exist!";
+          }
+          console.log(typeof(money));
+          const newPickedWallet = pickedUserDoc.data().wallet + Number(money);
+          console.log(typeof(newPickedWallet))
+          if (newPickedWallet > 0) {
+            transaction.update(pickedUserDocRef, { wallet: newPickedWallet });
+            return newPickedWallet;
+          } else {
+            return Promise.reject(" Sorry! There is a problem " )
+          }
+        });
+        console.log("PickedUserWallet increased to ", newPickedUserWallet);
+
+      } catch (e) {
+        console.error(e);
+      }
     }
   },
   modules: {

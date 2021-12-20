@@ -26,8 +26,13 @@ export default {
   },
   methods: {
     sendMoney(money) {
-      this.$store.dispatch('actionSendMoneyWindow', false)
-      this.$store.dispatch('updateWallet', money)
+      if (money > 0) {
+        this.$store.dispatch('actionSendMoneyWindow', false)
+        this.$store.dispatch('updateWallet', money)
+      } else {
+        this.$store.dispatch('actionSendMoneyWindow', false)
+        console.log("Input Error")
+      }
     }
   }
 }
