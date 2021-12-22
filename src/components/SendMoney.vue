@@ -5,7 +5,7 @@
       <span class="modal_message">送る金額</span>
       <input type="text" v-model="money">
       <div class="modal_action">
-        <button class="modal_btn" @click="sendMoney(money)">送信</button>
+        <button class="modal_btn" @click="sendMoney()">送信</button>
       </div>
     </div>
   </div>
@@ -25,15 +25,23 @@ export default {
     }
   },
   methods: {
-    sendMoney(money) {
-      if (money > 0) {
+    checkMoney() {
+      const regexp = /^\d*$/
+      if (!this.money || !regexp.test(this.money)) {
+        return false
+      } else {
+        return true
+      }
+    },
+    sendMoney() {
+      if (!this.checkMoney()) {
         this.$store.dispatch('actionSendMoneyWindow', false)
-        this.$store.dispatch('updateWallet', money)
+        console.log('Error')
       } else {
         this.$store.dispatch('actionSendMoneyWindow', false)
-        console.log("Input Error")
+        this.$store.dispatch('updateWallet', this.money)
       }
-    }
+    },
   }
 }
 </script>

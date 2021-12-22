@@ -187,9 +187,7 @@ export default new Vuex.Store({
           if (!myDoc.exists()) {
             throw "MyDocument does not exist!";
           }
-          console.log(typeof(money));
           const newWallet = myDoc.data().wallet - Number(money);
-          console.log(typeof(newWallet));
           if (newWallet >= 0) {
             transaction.update(myDocRef, { wallet: newWallet });
             return newWallet;
@@ -206,9 +204,7 @@ export default new Vuex.Store({
           if (!pickedUserDoc.exists()) {
             throw "PickedUserDocument does not exist!";
           }
-          console.log(typeof(money));
           const newPickedWallet = pickedUserDoc.data().wallet + Number(money);
-          console.log(typeof(newPickedWallet))
           if (newPickedWallet > 0) {
             transaction.update(pickedUserDocRef, { wallet: newPickedWallet });
             return newPickedWallet;
