@@ -178,42 +178,25 @@ export default new Vuex.Store({
       querySnapshot.forEach((user) => {
         documentId = user.id
       });
-      //自分のwalletを減らす（減らした後が0以上の場合は実行）
+      //自分と送金先のドキュメントを読み込む
       const myDocumentId = getters.gettersMyDocumentId;
       const myDocRef = doc(db, "users", myDocumentId);
+      const pickedUserDocRef = doc(db, "users", documentId);
       try {
-        const newMyWallet = await runTransaction(db, async (transaction) => {
+        //トランザクション処理
+        await runTransaction(db, async (transaction) => {
           const myDoc = await transaction.get(myDocRef);
-          if (!myDoc.exists()) {
-            throw "MyDocument does not exist!";
-          }
+          const pickedUserDoc = await transaction.get(pickedUserDocRef);
           const newWallet = myDoc.data().wallet - Number(money);
+          //送金後の自分のwalletが0以上の場合は実行
           if (newWallet >= 0) {
             transaction.update(myDocRef, { wallet: newWallet });
-            return newWallet;
+            const newPickedWallet = pickedUserDoc.data().wallet + Number(money);
+            transaction.update(pickedUserDocRef, { wallet: newPickedWallet });
           } else {
             return Promise.reject(" Sorry! Not Enough Money Left ");
           }
         });
-        console.log(" MyWallet decreased to ", newMyWallet);
-
-        //選択したユーザのwalletに加算する
-        const pickedUserDocRef = doc(db, "users", documentId);
-        const newPickedUserWallet = await runTransaction(db, async (transaction) => {
-          const pickedUserDoc = await transaction.get(pickedUserDocRef);
-          if (!pickedUserDoc.exists()) {
-            throw "PickedUserDocument does not exist!";
-          }
-          const newPickedWallet = pickedUserDoc.data().wallet + Number(money);
-          if (newPickedWallet > 0) {
-            transaction.update(pickedUserDocRef, { wallet: newPickedWallet });
-            return newPickedWallet;
-          } else {
-            return Promise.reject(" Sorry! There is a problem " )
-          }
-        });
-        console.log("PickedUserWallet increased to ", newPickedUserWallet);
-
       } catch (e) {
         console.error(e);
       }
