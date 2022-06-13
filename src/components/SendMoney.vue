@@ -25,9 +25,23 @@ export default {
     }
   },
   methods: {
+    checkMoney() {
+      const regexp = /^\d*$/
+      if (!this.money || !regexp.test(this.money)) {
+        return false
+      } else {
+        return true
+      }
+    },
     sendMoney() {
-      this.$store.dispatch('actionSendMoneyWindow', false)
-    }
+      if (!this.checkMoney()) {
+        this.$store.dispatch('actionSendMoneyWindow', false)
+        console.log('Error')
+      } else {
+        this.$store.dispatch('actionSendMoneyWindow', false)
+        this.$store.dispatch('updateWallet', this.money)
+      }
+    },
   }
 }
 </script>
